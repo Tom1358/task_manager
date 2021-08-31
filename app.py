@@ -86,7 +86,19 @@ def profile(username):
         {"username": session["user"]})["username"] 
         # final square bracket specifies that we only want to grab the 'username' key field from 
         # this record, and not others (e.g. password)
-    return render_template("profile.html", username=username)
+    
+    if session["user"]:
+        return render_template("profile.html", username=username)
+    
+    return redirect(url_for("login"))
+
+
+@app.route("/logout")
+def logout():
+    # remove user from session cookies
+    flash("You have been logged out")
+    session.clear() # or session.pop("user")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
