@@ -86,10 +86,10 @@ def profile(username):
         {"username": session["user"]})["username"] 
         # final square bracket specifies that we only want to grab the 'username' key field from 
         # this record, and not others (e.g. password)
-    
+
     if session["user"]:
         return render_template("profile.html", username=username)
-    
+
     return redirect(url_for("login"))
 
 
@@ -152,6 +152,22 @@ def delete_task(task_id):
 def get_categories():
     categories = list(mongo.db.categories.find().sort("category_name", 1))
     return render_template("categories.html", categories=categories)
+
+
+@app.route("/add_category", methods=["GET", "POST"])
+def add_category():
+    if request.method == "POST": 
+        # if requested HTTP method is POST, the following dictionary will be created
+        # that will be inserted into the database, stored in a variable called 'category'
+        category = {
+            "category_name": request.form.get("category_name")
+        }
+        mongo.db.categories.insert_one(category)
+        flash("New Category Added")
+        return redirect(url_for("get_categories"))
+
+    return render_template("add_category.html")
+
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
