@@ -25,6 +25,19 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    query = request.form.get("query")
+    # could use the following line to create an index:
+    # mongo.db.tasks.create_index([("task_name", "text"), ("task_description", "text")])
+    # HOWEVER, it would create the index for every instance that this function gets called
+    # If you had more than one user searching the database at any given time, it would error
+    # Therefore, better to include that line of code within the Python Interpreter (command line)
+    # because then the index would only be created once
+    tasks = list(mongo.db.tasks.find({"$text": {"$search": query}}))
+    return render_template("tasks.html", tasks=tasks)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
